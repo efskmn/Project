@@ -63,14 +63,13 @@ arr_xylimits = np.array([-0.25,2.,5,-4])
 
 # Read the data
 print ("Reading {}.".format(args.dat))
-dat = np.genfromtxt(args.dat, usecols=(args.j,args.k),skip_header=3, invalid_raise=True)
-print (np.shape(dat))
+dat = np.genfromtxt(args.dat, usecols=(args.j,args.k),skip_header=15, invalid_raise=True)
 
-#m = (dat[:,0] < 30) & (dat[:,0] > -30) & (dat[:,1] < 30) & (dat[:,1] > -30)
+m = (dat[:,0] < 30) & (dat[:,0] > -30) & (dat[:,1] < 30) & (dat[:,1] > -30)
 
 #Mask out for the data that is too large
-X = dat[:,0]-dat[:,1]
-Y = dat[:,1]
+X = dat[m,0]-dat[m,1]
+Y = dat[m,1]
 
 # show the image
 figure, ax = pl.subplots(num=None,nrows=1, ncols=1, figsize=(11, 10), dpi=80, facecolor='w', edgecolor='k')
