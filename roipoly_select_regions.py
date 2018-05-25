@@ -53,8 +53,7 @@ args = parser.parse_args()
 
 #######################################################################################
 
-#os.chdir("/net/nas3/popes/efsokmen/MW/DATA/VVV/DISK/d038")
-os.chdir("/run/media/efsokmen/Elements/SIMULATIONS/SYNTHETIC_D_EJK/")
+os.chdir("-")
 
 # Read the data
 dat = np.genfromtxt(args.dat, usecols=(args.j,args.k),skip_header=3, invalid_raise=False)
