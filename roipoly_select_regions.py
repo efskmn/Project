@@ -147,20 +147,45 @@ axHisty = divider.append_axes("right", 1.2, pad=0.1, sharey=ax)
 
 
 # now determine nice limits by hand:
-binwidth = 0.001
-xymax = max(np.max(np.abs(X)), np.max(np.abs(Y)))
-lim = (int(xymax/binwidth) + 1)*binwidth
+binwidth = 0.05
+xmax = np.max(np.abs(X))
+ymax = np.max(np.abs(Y))
+lim_x = (int(xmax/0.01) + 1)*0.01
+lim_y = (int(ymax/binwidth) + 1)*binwidth
+binsx = np.arange(-lim_x, lim_x + 0.01, 0.01)
+binsy = np.arange(-lim_y, lim_y + binwidth, binwidth)
 
-bins = np.arange(-lim, lim + binwidth, binwidth)
+def make_errorbars(yedges,xedges,a_bincenters,b_width):
+    bincenters = a_bincenters*(xedges[1:]+xedges[:-1])
+    menStd     = np.sqrt(yedges)
+    width      = b_width
+    return bincenters, menStd, width
+
+
 # Color histogram for RC
-n_rc_1,bi_rc_1,patches_rc_1 = axHistx.hist(X[np.where(mask_roi1)],errorbars=True, bins=bins, histtype="step", lw=1.2, color='red')
+n_rc_1,bi_rc_1,patches_rc_1 = axHistx.hist(X[np.where(mask_roi1)], bins=binsx, histtype="step", lw=1.2, color='red')
+
+#bincenters_rcc, menStd_rcc,width_rcc = make_errorbars(n_rc_1,bi_rc_1,0.5,2*binwidth)
+#axHistx.bar(bincenters_rcc,n_rc_1,width_rcc, color='w', yerr=menStd_rcc)
+
 # Ks histogram for RC
-n_rc_2,bi_rc_2,patches_rc_2 = axHisty.hist(Y[np.where(mask_roi1)],errorbars=True, bins=bins, histtype="step", lw=1.2, color='red',orientation='horizontal')
+n_rc_2,bi_rc_2,patches_rc_2 = axHisty.hist(Y[np.where(mask_roi1)], bins=binsy, histtype="step", lw=1.2, color='red',orientation='horizontal')
+
+#bincenters_rck, menStd_rck,width_rck= make_errorbars(n_rc_2,bi_rc_2,0.5,2*binwidth)
+#axHisty.bar(bincenters_rck,n_rc_2,width_rck, color='w', yerr=menStd_rck)
+
 
 # Color histogram for MS
-n_ms_1,bi_ms_1,patches_ms_1 = axHistx.hist(X[np.where(mask_roi2)],errorbars=True, bins=bins, histtype="step", lw=1.2, color='blue')
+n_ms_1,bi_ms_1,patches_ms_1 = axHistx.hist(X[np.where(mask_roi2)], bins=binsx, histtype="step", lw=1.2, color='blue')
+
+#bincenters_mc, menStd_mc, width_mc = make_errorbars(n_ms_1, bi_ms_1, 0.5, 2*binwidth)
+#axHistx.bar(bincenters_mc,n_ms_1,width_mc, color='w', yerr=menStd_mc)
+
 # Ks histogram for MS
-n_ms_2,bi_ms_2,patches_ms_2 = axHisty.hist(Y[np.where(mask_roi2)],errorbars=True, bins=bins, histtype="step", lw=1.2, color='blue',orientation='horizontal')
+n_ms_2,bi_ms_2,patches_ms_2 = axHisty.hist(Y[np.where(mask_roi2)], bins=binsy, histtype="step", lw=1.2, color='blue',orientation='horizontal')
+
+#bincenters_mk, menStd_mk, width_mk =make_errorbars(n_ms_2,bi_ms_2, 0.5,2*binwidth)
+#axHisty.bar(bincenters,n_ms_2,width_mk, color='w', yerr=menStd_mk)
 
 #Write the ratio of MS to RC in the histogram plots
 axHistx.legend(['$MS/RC={}$'.format(round((np.max(n_ms_1)/np.max(n_rc_1)),1))], loc='best')
@@ -172,8 +197,8 @@ axHistx.xaxis.set_tick_params(labelbottom=False)
 axHisty.yaxis.set_tick_params(labelleft=False)
 
 # set the ticks of the y axis of vertical histogram and x ticks of horizontal histogram
-axHistx.set_yticks(np.arange(0, np.max(n_ms_1), 400))
-axHisty.set_xticks(np.arange(0, np.max(n_ms_2), 400))
+axHistx.set_yticks(np.arange(0, np.max(n_ms_1), 200))
+axHisty.set_xticks(np.arange(0, np.max(n_ms_2), 200))
 
 # set grids
 axHistx.grid(b=True, which='major', color='gray', linestyle='-.', linewidth=0.5)
@@ -198,9 +223,9 @@ k_hist_ms = [n_ms_2,bi_ms_2]
 sorted_jks = sorted(X[m][np.where(mask_roi2)])
 minimum, maxsimum = np.min(sorted_jks), np.max(sorted_jks)
 
-
 nbinsize=0.001
 nbins = np.arange(minimum-0.5, maxsimum+0.5, nbinsize)
+
 
 # Plot the MS histogram and shifted CDF
 figur, axs = pl.subplots(nrows=1, ncols=2, sharex=False, sharey=False, figsize=(10,5), dpi=80, facecolor='w', edgecolor='k')

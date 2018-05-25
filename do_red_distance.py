@@ -63,19 +63,25 @@ AJ = (1+args.red_slope)/args.red_slope
 os.chdir(args.cdfdir)
 #print ("Changed directory to {}".format(args.cdfdir))
 
-fil = np.genfromtxt("MS_strip_CDF_"+args.dat[:-6]+".dat")
+if not os.path.isfile("MS_strip_CDF_"+args.dat[:-6]+".dat"):
+  print ('File ' + "MS_strip_CDF_"+args.dat[:-6]+".dat" + ' not found!')
+  fil = [np.zeros(800),np.zeros(800)]
+  fil = np.array(fil)
+else:
+  fil = np.genfromtxt("MS_strip_CDF_"+args.dat[:-6]+".dat")
+
 
 os.chdir(args.spopdir)
 #print ("Changed directory to {}".format(args.spopdir))
-ss11 = np.genfromtxt(args.spop,skip_header=15, invalid_raise=True, usecols=(17,19)) # 17 19
+ss11 = np.genfromtxt(args.spop,skip_header=15, invalid_raise=True, usecols=(0,1)) # 17 19 (antonio) 14 16 (sebastian)
 sj = ss11[:,0]
 sk = ss11[:,1]
 
-agemetal = np.genfromtxt(args.spop,skip_header=15, invalid_raise=True, usecols=(10,11)) # antonio's output case
-age = agemetal[:,0]
-metal = agemetal[:,1]
-age = (np.array([age]*howlarge)).reshape((age.size*howlarge,))
-metal = (np.array([metal]*howlarge)).reshape((metal.size*howlarge,))
+#agemetal = np.genfromtxt(args.spop,skip_header=15, invalid_raise=True, usecols=(10,11)) # antonio's output case
+#age = agemetal[:,0]
+#metal = agemetal[:,1]
+#age = (np.array([age]*howlarge)).reshape((age.size*howlarge,))
+#metal = (np.array([metal]*howlarge)).reshape((metal.size*howlarge,))
 
 
 sj = (np.array([sj]*howlarge)).reshape((sj.size*howlarge,))
@@ -132,7 +138,7 @@ lredderk = np.array(lredderk)
 gc.collect()
 
 fig, axs = pl.subplots(nrows=1, ncols=1, sharex=False, sharey=False, figsize=(9,10), dpi=80, facecolor='w', edgecolor='k')
-fig.text(0.5,0.93, "MS strip dispersion simulated on the sCMD \n distances $\mu={}kpc, \sigma={}kpc, Reddening slope = {}$".format(args.mu,args.sigma,args.red_slope),ha='center', fontsize=12)
+fig.text(0.5,0.93, "synthetic CMD \n distances $\mu={}kpc, \sigma={}kpc, Reddening slope = {}$".format(args.mu,args.sigma,args.red_slope),ha='center', fontsize=12)
 axs.plot(lredderj-lredderk,lredderk,  'k.',ms=0.1)
 axs.set_title("File: {}".format(args.spop), fontsize=14)
 axs.set_xlabel("J-Ks",fontsize=16)
@@ -160,7 +166,7 @@ if args.saveornot is True:
     filow = open("Disp_"+str(args.spop)[:-4]+args.dat[9:-6]+"{}mu{}sigma{}slope{}".format(mlen,mmu, msig, mslope)+".dat", "w+")
     #filow.write("#    J-Ks    Ks        Age        Fe/H\n")
     for i in np.arange(0,len(lredderj)): 
-        filow.write( "%7.3f%7.3f%12.4e%12.4e \n" % (lredderj[i], lredderk[i], age[i], metal[i])) 
+        filow.write( "%7.3f%7.3f \n" % (lredderj[i], lredderk[i])) 
     
     filow.close()
     print ("Saved file", "Disp_"+str(args.spop)[:-4]+args.dat[9:-6]+"{}mu{}sigma{}slope{}".format(mlen,mmu, msig, mslope)+".dat")
