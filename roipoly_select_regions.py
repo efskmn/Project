@@ -4,7 +4,7 @@
 #
 # Draw and select two masked regions for MS and RC. Obtain their histograms with the CMD plot.
 # Example: in a working ipython window
-# run #/roipoly_select_regions.py -dat "x.raw" -j 3 -k 5 -ms 0.3 -saveornot True
+# run /scratch1/efsan/SCRIPTS/roipoly_select_regions.py -dat "011d038JK.raw" -j 3 -k 5 -ms 0.3 -saveornot True
  
 ############################# BLOCK IMPORTS AND STUFF #################################
 
@@ -30,7 +30,9 @@ def chunks(l, n):
 
 parser = argp.ArgumentParser(description='Plot and make two ROIs!')
 
-parser.add_argument('-dat',help='dat: the ALLSTAR/DAOPHOT output to work with.',required=True)
+parser.add_argument('-dat',help='dat: the ALLSTAR/DAOPHOT or IAC-star output to work with.',required=True)
+
+parser.add_argument('-wdir',help='dir: the directory where the dat file is.',required=True)
 
 parser.add_argument('-j',help='j: The column number(s) for j.',required=True, type=int)
 
@@ -48,33 +50,37 @@ parser.add_argument('-mssim', help='mssim: Do you want to apply the MS strip wit
 
 parser.add_argument('-spop', help='spop: to which synthetic population?', required=False, type=str, nargs='?', default=False)
 
+#parser.add_argument('--list_xylimits', nargs='+', help='xylimits: what are the limits of the frame', type=list, required=False, default=[-0.5,6.7,22,-3])
 
 args = parser.parse_args()
 
 #######################################################################################
 
-os.chdir("-")
+#os.chdir("/net/nas3/popes/efsokmen/MW/DATA/VVV/DISK/d038")
+os.chdir(args.wdir)
+
+arr_xylimits = np.array([-0.25,2.,5,-4])
 
 # Read the data
-dat = np.genfromtxt(args.dat, usecols=(args.j,args.k),skip_header=3, invalid_raise=False)
+print ("Reading {}.".format(args.dat))
+dat = np.genfromtxt(args.dat, usecols=(args.j,args.k),skip_header=3, invalid_raise=True)
 print (np.shape(dat))
 
-m = (dat[:,0] < 30) & (dat[:,0] > -30) & (dat[:,1] < 30) & (dat[:,1] > -30)
+#m = (dat[:,0] < 30) & (dat[:,0] > -30) & (dat[:,1] < 30) & (dat[:,1] > -30)
 
 #Mask out for the data that is too large
-X = dat[m,0]-dat[m,1]
-Y = dat[m,1]
+X = dat[:,0]-dat[:,1]
+Y = dat[:,1]
 
 # show the image
 figure, ax = pl.subplots(num=None,nrows=1, ncols=1, figsize=(11, 10), dpi=80, facecolor='w', edgecolor='k')
 ax = pl.gca()
-ax.invert_yaxis()
 pl.plot(X ,Y, 'k.', ms=args.ms)
 pl.grid(b=True, which='major', color='gray', linestyle='-.', linewidth=0.6)
 pl.title('1st ROI, left click: line segment, right click: close region')
-ax.set_ylim(11,20.)
-ax.set_xlim(-0.35,2.7)
-ax.invert_yaxis()
+#ax.set_ylim(11,20.)
+#ax.set_xlim(-0.35,2.7)
+ax.axis(arr_xylimits)
 
 # let user draw first ROI
 ROI1 = roipoly(roicolor='r') #let user draw first ROI
@@ -83,9 +89,9 @@ ROI1 = roipoly(roicolor='r') #let user draw first ROI
 ax = pl.gca()
 pl.plot(X ,Y, 'k.', ms=args.ms)
 pl.grid(b=True, which='major', color='gray', linestyle='-.', linewidth=0.6)
-ax.set_ylim(11,20.)
-ax.set_xlim(-0.35,2.7)
-ax.invert_yaxis()
+#ax.set_ylim(11,20.)
+#ax.set_xlim(-0.35,2.7)
+ax.axis(arr_xylimits)
 ROI1.displayROI()
 pl.title('2nd ROI, left click: line segment, right click: close region')
 
@@ -100,10 +106,11 @@ ROI2.displayROI()
 pl.xlabel("J-K",fontsize=14)
 pl.ylabel("K",fontsize=14)
 pl.grid(b=True, which='major', color='gray', linestyle='-.', linewidth=0.6)
-ax.set_ylim(11,20.)
-ax.set_xlim(-0.35,2.7)
+#ax.set_ylim(11,20.)
+#ax.set_xlim(-0.35,2.7)
+ax.axis(arr_xylimits)
+
 ax = pl.gca()
-ax.invert_yaxis()
 pl.title('RC (red) and MS (blue) strips for {}'.format(args.dat),fontsize=14)
 pl.show()
 
@@ -125,8 +132,9 @@ pl.xlabel("J-K",fontsize=14)
 pl.ylabel("K",fontsize=14)
 pl.grid(b=True, which='major', color='gray', linestyle='-.', linewidth=0.5)
 ax = pl.gca()
-ax.invert_yaxis()
-ax.axis([0.0,2.7,19.8,12])
+#ax.axis([0.0,2.7,19.8,12])
+ax.axis(arr_xylimits)
+
 figure.text(0.20,0.95,'RC (red) and MS (blue) strips for {}'.format(args.dat),fontsize=14)
 
 divider = make_axes_locatable(ax)
