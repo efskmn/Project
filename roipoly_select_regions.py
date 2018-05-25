@@ -4,7 +4,7 @@
 #
 # Draw and select two masked regions for MS and RC. Obtain their histograms with the CMD plot.
 # Example: in a working ipython window
-# run /scratch1/efsan/SCRIPTS/roipoly_select_regions.py -dat "011d038JK.raw" -j 3 -k 5 -ms 0.3 -saveornot True
+# run #/roipoly_select_regions.py -dat "x.raw" -j 3 -k 5 -ms 0.3 -saveornot True
  
 ############################# BLOCK IMPORTS AND STUFF #################################
 
