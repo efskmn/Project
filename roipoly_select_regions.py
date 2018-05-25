@@ -121,7 +121,12 @@ else:
 
 
 mask_roi1 = roi(ROI1, X , Y)
-mask_roi2 = roi(ROI2, X, Y)
+
+try:
+    mask_roi2 = roi(ROI2, X, Y)
+except(AttributeError,ValueError):
+    mask_roi2 = mask_roi1
+
 
 figure, ax = pl.subplots(num=None,nrows=1, ncols=1, figsize=(11, 10), dpi=80, facecolor='w', edgecolor='k')
 ax.plot(X,Y,'k.', ms=args.ms)
@@ -142,20 +147,20 @@ axHisty = divider.append_axes("right", 1.2, pad=0.1, sharey=ax)
 
 
 # now determine nice limits by hand:
-binwidth = 0.05
+binwidth = 0.001
 xymax = max(np.max(np.abs(X)), np.max(np.abs(Y)))
 lim = (int(xymax/binwidth) + 1)*binwidth
 
 bins = np.arange(-lim, lim + binwidth, binwidth)
 # Color histogram for RC
-n_rc_1,bi_rc_1,patches_rc_1 = axHistx.hist(X[np.where(mask_roi1)], bins=bins, histtype="step", lw=1.2, color='red')
+n_rc_1,bi_rc_1,patches_rc_1 = axHistx.hist(X[np.where(mask_roi1)],errorbars=True, bins=bins, histtype="step", lw=1.2, color='red')
 # Ks histogram for RC
-n_rc_2,bi_rc_2,patches_rc_2 = axHisty.hist(Y[np.where(mask_roi1)], bins=bins, histtype="step", lw=1.2, color='red',orientation='horizontal')
+n_rc_2,bi_rc_2,patches_rc_2 = axHisty.hist(Y[np.where(mask_roi1)],errorbars=True, bins=bins, histtype="step", lw=1.2, color='red',orientation='horizontal')
 
 # Color histogram for MS
-n_ms_1,bi_ms_1,patches_ms_1 = axHistx.hist(X[np.where(mask_roi2)], bins=bins, histtype="step", lw=1.2, color='blue')
+n_ms_1,bi_ms_1,patches_ms_1 = axHistx.hist(X[np.where(mask_roi2)],errorbars=True, bins=bins, histtype="step", lw=1.2, color='blue')
 # Ks histogram for MS
-n_ms_2,bi_ms_2,patches_ms_2 = axHisty.hist(Y[np.where(mask_roi2)], bins=bins, histtype="step", lw=1.2, color='blue',orientation='horizontal')
+n_ms_2,bi_ms_2,patches_ms_2 = axHisty.hist(Y[np.where(mask_roi2)],errorbars=True, bins=bins, histtype="step", lw=1.2, color='blue',orientation='horizontal')
 
 #Write the ratio of MS to RC in the histogram plots
 axHistx.legend(['$MS/RC={}$'.format(round((np.max(n_ms_1)/np.max(n_rc_1)),1))], loc='best')
@@ -194,7 +199,7 @@ sorted_jks = sorted(X[m][np.where(mask_roi2)])
 minimum, maxsimum = np.min(sorted_jks), np.max(sorted_jks)
 
 
-nbinsize=0.04
+nbinsize=0.001
 nbins = np.arange(minimum-0.5, maxsimum+0.5, nbinsize)
 
 # Plot the MS histogram and shifted CDF
